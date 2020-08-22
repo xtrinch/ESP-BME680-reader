@@ -2,16 +2,16 @@
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
-#include <HTTPClient.h>
-#include <WiFi.h>
+
+#ifdef ESP32
+  #include <HTTPClient.h>
+  #include <WiFi.h>
+#elif ESP8266
+  #include <ESP8266HTTPClient.h>
+  #include <ESP8266WiFi.h>
+#endif
 
 using namespace std;
-
-// BME680 defines
-#define BME_SCK 13
-#define BME_MISO 12
-#define BME_MOSI 11
-#define BME_CS 10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -40,7 +40,7 @@ void setupWiFi() {
 void setupBME680() {
   if (!bme.begin(0x76)) {
     Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    while (1);
+    return;
   }
 
   // Set up oversampling and filter initialization
@@ -51,37 +51,28 @@ void setupBME680() {
   bme.setGasHeater(320, 150); // 320*C for 150 ms
 }
 
-void print_wakeup_reason() {
-  esp_sleep_wakeup_cause_t wakeup_reason;
-
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  switch(wakeup_reason)
-  {
-    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
-    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
-    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
-    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
-  }
-}
-
 void goToSleep() {
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
   " Seconds");
 
+  #ifdef ESP32
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   // shut practically everything off
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_XTAL, ESP_PD_OPTION_OFF);
+  #endif
 
-  Serial.println("Going to sleep now");
   delay(1000);
-  Serial.flush(); 
+  Serial.flush();
+
+  #ifdef ESP32
   esp_deep_sleep_start();
+  #elif ESP8266
+  ESP.deepSleep(TIME_TO_SLEEP * uS_TO_S_FACTOR, WAKE_RFCAL);
+  #endif
+
   Serial.println("This will never be printed");
 }
 
@@ -143,18 +134,20 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  print_wakeup_reason();
-
   setupBME680();
 
   setupWiFi();
 
   http.begin("http://" + String(xstr(SENSOR_DASHBOARD_URL)) + "/api/measurements/multi");
+
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
   if (! bme.performReading()) {
     Serial.println("Failed to perform reading :(");
+
+    goToSleep();
     return;
   }
 
