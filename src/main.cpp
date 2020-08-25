@@ -27,11 +27,19 @@ Adafruit_BME680 bme; // I2C
 HTTPClient http;
 
 void setupWiFi() {
+  int wifiRetriesLeft = 10;
+
   WiFi.begin(xstr(WIFI_SSID), xstr(WIFI_PASSWORD));
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED && wifiRetriesLeft > 0) {
     delay(500);
     Serial.println("Connecting to WiFi..");
+    wifiRetriesLeft -= 1;
+  }
+
+  if (wifiRetriesLeft <= 0) {
+    Serial.println("Could not connect to WiFi.");
+    goToSleep();
   }
   
   Serial.println("Connected to WiFi");
@@ -153,7 +161,6 @@ void loop() {
 
   if(WiFi.status() != WL_CONNECTED) {
     Serial.print("WIFI disconnected.");
-    delay(5000);
     return;
   }
   
