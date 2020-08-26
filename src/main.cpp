@@ -26,38 +26,6 @@ using namespace std;
 Adafruit_BME680 bme; // I2C
 HTTPClient http;
 
-void setupWiFi() {
-  int wifiRetriesLeft = 10;
-
-  WiFi.begin(xstr(WIFI_SSID), xstr(WIFI_PASSWORD));
-
-  while (WiFi.status() != WL_CONNECTED && wifiRetriesLeft > 0) {
-    delay(500);
-    Serial.println("Connecting to WiFi..");
-    wifiRetriesLeft -= 1;
-  }
-
-  if (wifiRetriesLeft <= 0) {
-    Serial.println("Could not connect to WiFi.");
-    goToSleep();
-  }
-  
-  Serial.println("Connected to WiFi");
-}
-
-void setupBME680() {
-  if (!bme.begin(0x76)) {
-    Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    return;
-  }
-
-  // Set up oversampling and filter initialization
-  bme.setTemperatureOversampling(BME680_OS_8X);
-  bme.setHumidityOversampling(BME680_OS_2X);
-  bme.setPressureOversampling(BME680_OS_4X);
-  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
-  bme.setGasHeater(320, 150); // 320*C for 150 ms
-}
 
 void goToSleep() {
   Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
@@ -82,6 +50,40 @@ void goToSleep() {
   #endif
 
   Serial.println("This will never be printed");
+}
+
+void setupWiFi() {
+  int wifiRetriesLeft = 10;
+
+  WiFi.begin(xstr(WIFI_SSID), xstr(WIFI_PASSWORD));
+
+  while (WiFi.status() != WL_CONNECTED && wifiRetriesLeft > 0) {
+    delay(500);
+    Serial.println("Connecting to WiFi..");
+    wifiRetriesLeft -= 1;
+  }
+
+  if (wifiRetriesLeft <= 0) {
+    Serial.println("Could not connect to WiFi.");
+    goToSleep();
+  }
+  
+  Serial.println("Connected to WiFi");
+}
+
+void setupBME680() {
+  if (!bme.begin(0x76)) {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    goToSleep();
+    return;
+  }
+
+  // Set up oversampling and filter initialization
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setPressureOversampling(BME680_OS_4X);
+  bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+  bme.setGasHeater(320, 150); // 320*C for 150 ms
 }
 
 String getJsonPayload(Adafruit_BME680 bme) {
@@ -148,7 +150,7 @@ void setup() {
 
   http.begin("http://" + String(xstr(SENSOR_DASHBOARD_URL)) + "/api/measurements/multi");
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  //pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
