@@ -2,13 +2,9 @@
 
 using namespace std;
 
-// sleep defines
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-
-void ICACHE_RAM_ATTR wakeUp(void)
-{
-  // do nothing
-}
+int btnState, prevBtnState;
+long btnPressCount = 0;
+unsigned long btnPressMillis = 0;
 
 void goToSleep() {
   Serial.println("Setup ESP32 to sleep for every " + String(CFG_SLEEP_SECONDS) +
@@ -35,8 +31,6 @@ void goToSleep() {
   Serial.println("This will never be printed");
 }
 
-int val;
-
 void setup() {
   Serial.begin(9600);
   while (!Serial);
@@ -44,10 +38,7 @@ void setup() {
   setupEEPROM();
 
   // pin is pulled low by the button when active
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-
-  // // wake up when button is pulled low
-  // attachInterrupt(BUTTON_PIN, wakeUp, FALLING);
+  pinMode(BTN_PIN, INPUT_PULLUP);
 
   if (!WiFiCredentialsSaved()) {
     if (!setupAP()) {
@@ -58,8 +49,8 @@ void setup() {
     cleanupAP();
   }
 
-  val = digitalRead(BUTTON_PIN); // check the state of the button
-  if (val != LOW) {
+  btnState = digitalRead(BTN_PIN); // check the state of the button
+  if (btnState != BTN_PRESSED_STATE) {
     if (!setupWiFi()) {
       goToSleep();
     }
@@ -70,46 +61,34 @@ void setup() {
   }
 }
 
-int prevVal;
-long keyPressCount = 0;
-const unsigned long keySampleIntervalMs = 25;
-unsigned long keyPrevMillis = 0;
-byte longKeyPressCountMax = 80;    // 80 * 25 = 2000 ms
-
 void loop() {
-  val = digitalRead(BUTTON_PIN); // check the state of the button
+  btnState = digitalRead(BTN_PIN); // check the state of the button
 
-  if (millis() - keyPrevMillis >= keySampleIntervalMs) {
-    keyPrevMillis = millis();
+  if (millis() - btnPressMillis >= BTN_SAMPLE_INTERVAL) {
+    btnPressMillis = millis();
 
-    if(val == LOW && prevVal == HIGH) // if button is pressed, turn LED on
-    {
+    if(btnState == BTN_PRESSED_STATE && prevBtnState == BTN_RELEASED_STATE) {
       Serial.println("Key press");
-      keyPressCount = 0;
-    }
-    else if (val == HIGH && prevVal == LOW)
-    {
-      Serial.println("Key release");
-    } else if (val == LOW) {
-      keyPressCount ++;
+      btnPressCount = 0;
+    } else if (btnState == BTN_PRESSED_STATE) {
+      btnPressCount ++;
     }
 
-    if (keyPressCount >= longKeyPressCountMax) {
-      Serial.println("Long key press");
+    if (btnPressCount >= BTN_RESET_CYCLES) {
       clearWiFiCredentials();
-      // something very negative
-      keyPressCount = -10*longKeyPressCountMax;
+      // reset so it will execute setup again
+      ESP.restart();
     }
 
-    prevVal = val;
+    prevBtnState = btnState;
   }
 
-  if (val == LOW) {
+  if (btnState == BTN_PRESSED_STATE) {
     // do not execute anything else when button is pressed
     return;
   }
 
-  if (! bme.performReading()) {
+  if (!bme.performReading()) {
     Serial.println("Failed to perform reading :(");
 
     goToSleep();

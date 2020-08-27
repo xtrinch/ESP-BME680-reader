@@ -11,8 +11,13 @@
 #include <Wire.h>
 #include <SPI.h>
 
-#define BUTTON_PIN 13
-#define BUTTON_PRESS_LENGTH 2000 //ms
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define BTN_PIN 13
+#define BTN_PRESS_LENGTH 2000 //ms
+#define BTN_SAMPLE_INTERVAL 25
+#define BTN_RESET_CYCLES 80    // 80 * 25 = 2000 ms
+#define BTN_PRESSED_STATE LOW
+#define BTN_RELEASED_STATE HIGH
 
 // config defines
 #define CFG_SLEEP_SECONDS atoi(xstr(SLEEP_SECONDS))
