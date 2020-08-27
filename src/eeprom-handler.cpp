@@ -1,8 +1,6 @@
 
 #include "eeprom-handler.h"
 
-using namespace std;
-
 void setupEEPROM() {
   EEPROM.begin(512);  //Initialize EEPROM
 }
@@ -40,12 +38,31 @@ String readFromEEPROM(String name) {
   return String(value);
 }
 
+bool WiFiCredentialsSaved() {
+  String magicString = readFromEEPROM("magic_string");
+  if (strcmp(magicString.c_str(), xstr(MAGIC_STRING)) != 0) {
+    Serial.println("No WiFi credentials saved.");
+    return false;
+  }
+
+  return true;
+}
+
 WiFiCredentials readWiFiCredentials() {
-  struct WiFiCredentials credentials;
-  credentials.ssid = readFromEEPROM("ssid");
-  credentials.password = readFromEEPROM("password");
+  WiFiCredentials credentials;
+
+  String ssid = readFromEEPROM("ssid");
+  String password = readFromEEPROM("password");
+
+  credentials.ssid = ssid;
+  credentials.password = password;
 
   return credentials;
+}
+
+bool clearWiFiCredentials() {
+  Serial.println("Clearing Wi-Fi credentials");
+  return saveToEEPROM("magic_string", "");
 }
 
 bool saveWiFiCredentials(String ssid, String password) {

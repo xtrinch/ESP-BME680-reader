@@ -5,7 +5,7 @@ HTTPClient http;
 bool setupWiFi() {
   int wifiRetriesLeft = 50;
 
-  struct WiFiCredentials credentials = readWiFiCredentials();
+  WiFiCredentials credentials = readWiFiCredentials();
 
   WiFi.begin(credentials.ssid.c_str(), credentials.password.c_str());
 

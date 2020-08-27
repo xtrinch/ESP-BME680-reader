@@ -15,14 +15,18 @@
 #define CFG_WIFI_SSID xstr(WIFI_SSID)
 #define CFG_WIFI_PASSWORD xstr(WIFI_PASSWORD)
 
-struct WiFiCredentials {
+using namespace std;
+
+typedef struct WiFiCredentials_t {
   String ssid;
   String password;
-};
+} WiFiCredentials;
 
 void setupEEPROM();
 bool saveWiFiCredentials(String ssid, String password);
 bool saveToEEPROM(String name, String value);
-struct WiFiCredentials readWiFiCredentials();
+WiFiCredentials readWiFiCredentials();
+bool WiFiCredentialsSaved();
+bool clearWiFiCredentials();
 
 #endif
