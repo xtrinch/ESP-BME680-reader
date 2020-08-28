@@ -12,6 +12,8 @@ int getEEPROMAddress(String name) {
     return WIFI_PASSWORD_ADDRESS;
   } else if (strcmp(name.c_str(), "magic_string") == 0) {
     return MAGIC_STRING_ADDRESS;
+  } else if (strcmp(name.c_str(), "access_token") == 0) {
+    return SENSOR_ACCESS_TOKEN_ADDRESS;
   }
 
   return -1;
@@ -38,7 +40,7 @@ String readFromEEPROM(String name) {
   return String(value);
 }
 
-bool WiFiCredentialsSaved() {
+bool configSaved() {
   String magicString = readFromEEPROM("magic_string");
   if (strcmp(magicString.c_str(), xstr(MAGIC_STRING)) != 0) {
     Serial.println("No WiFi credentials saved.");
@@ -48,8 +50,8 @@ bool WiFiCredentialsSaved() {
   return true;
 }
 
-WiFiCredentials readWiFiCredentials() {
-  WiFiCredentials credentials;
+Config readConfig() {
+  Config credentials;
 
   String ssid = readFromEEPROM("ssid");
   String password = readFromEEPROM("password");
@@ -60,12 +62,12 @@ WiFiCredentials readWiFiCredentials() {
   return credentials;
 }
 
-bool clearWiFiCredentials() {
+bool clearConfig() {
   Serial.println("Clearing Wi-Fi credentials");
   return saveToEEPROM("magic_string", "");
 }
 
-bool saveWiFiCredentials(String ssid, String password) {
+bool saveConfig(String ssid, String password, String sensorAccessToken) {
   if (!ssid || ssid.length() == 0 || !password || password.length() == 0) {
     return false;
   }

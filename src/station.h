@@ -15,7 +15,6 @@
 #include "eeprom-handler.h"
 
 #define CFG_SENSOR_DASHBOARD_URL xstr(SENSOR_DASHBOARD_URL)
-#define CFG_SENSOR_ACCESS_TOKEN xstr(SENSOR_ACCESS_TOKEN)
 
 bool setupWiFi();
 bool sendMeasurement(String jsonPayload);

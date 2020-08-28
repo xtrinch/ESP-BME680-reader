@@ -20,9 +20,9 @@ extern WiFiServer server;
 #define CFG_ONBOARD_WIFI_PASSWORD xstr(ONBOARD_WIFI_PASSWORD)
 
 bool setupAP();
-void sendBasicWebsite(WiFiClient client);
-void listenForCredentials();
-bool saveWiFiCredentials(String ssid, String password);
+void sendSuccessResponse(WiFiClient client);
+void sendBadRequestResponse(WiFiClient client);
+void listenForConfig();
 bool cleanupAP();
 
 #endif

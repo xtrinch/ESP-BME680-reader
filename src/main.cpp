@@ -2,10 +2,6 @@
 
 using namespace std;
 
-int btnState, prevBtnState;
-long btnPressCount = 0;
-unsigned long btnPressMillis = 0;
-
 void goToSleep() {
   Serial.println("Setup ESP32 to sleep for every " + String(CFG_SLEEP_SECONDS) +
   " Seconds");
@@ -37,66 +33,40 @@ void setup() {
 
   setupEEPROM();
 
-  // pin is pulled low by the button when active
-  pinMode(BTN_PIN, INPUT_PULLUP);
+  setupButton();
 
-  if (!WiFiCredentialsSaved()) {
+  if (!configSaved()) {
     if (!setupAP()) {
       goToSleep();
     }
 
-    listenForCredentials();
+    listenForConfig();
     cleanupAP();
   }
 
-  btnState = digitalRead(BTN_PIN); // check the state of the button
-  if (btnState != BTN_PRESSED_STATE) {
-    if (!setupWiFi()) {
-      goToSleep();
-    }
-
-    if (!setupBME680()) {
-      goToSleep();
-    };
-  }
-}
-
-void loop() {
-  btnState = digitalRead(BTN_PIN); // check the state of the button
-
-  if (millis() - btnPressMillis >= BTN_SAMPLE_INTERVAL) {
-    btnPressMillis = millis();
-
-    if(btnState == BTN_PRESSED_STATE && prevBtnState == BTN_RELEASED_STATE) {
-      Serial.println("Key press");
-      btnPressCount = 0;
-    } else if (btnState == BTN_PRESSED_STATE) {
-      btnPressCount ++;
-    }
-
-    if (btnPressCount >= BTN_RESET_CYCLES) {
-      clearWiFiCredentials();
-      // reset so it will execute setup again
-      ESP.restart();
-    }
-
-    prevBtnState = btnState;
-  }
-
-  if (btnState == BTN_PRESSED_STATE) {
-    // do not execute anything else when button is pressed
+  // do not do anything if button is pressed
+  if (digitalRead(BTN_PIN) == BTN_PRESSED_STATE) {
+    Serial.println("Button pressed upon startup, skipping WiFi setup");
     return;
   }
 
+  if (!setupWiFi()) {
+    goToSleep();
+  }
+
+  if (!setupBME680()) {
+    goToSleep();
+  };
+
   if (!bme.performReading()) {
     Serial.println("Failed to perform reading :(");
-
     goToSleep();
     return;
   }
 
   if(WiFi.status() != WL_CONNECTED) {
     Serial.print("WIFI disconnected.");
+    goToSleep();
     return;
   }
   
@@ -104,6 +74,16 @@ void loop() {
   // Serial.print(jsonPayload);
 
   sendMeasurement(jsonPayload);
+}
+
+void loop() {
+  /* do nothing in loop except check button, 
+    esp will be in deep sleep in between measurements which will make setup re-run */
+
+  if (checkButtonPressed()) {
+      // do not execute anything else when button is pressed
+    return;
+  }
 
   goToSleep();
 }

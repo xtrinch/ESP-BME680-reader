@@ -5,7 +5,7 @@ HTTPClient http;
 bool setupWiFi() {
   int wifiRetriesLeft = 50;
 
-  WiFiCredentials credentials = readWiFiCredentials();
+  Config credentials = readConfig();
 
   WiFi.begin(credentials.ssid.c_str(), credentials.password.c_str());
 
@@ -30,7 +30,7 @@ bool setupWiFi() {
 bool sendMeasurement(String jsonPayload) {
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Accept", "application/json");
-  http.addHeader("Authorization", CFG_SENSOR_ACCESS_TOKEN);
+  http.addHeader("Authorization", readFromEEPROM("access_token"));
   int httpResponseCode = http.POST(jsonPayload);
 
   if (httpResponseCode > 0) {
