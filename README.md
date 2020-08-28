@@ -1,6 +1,6 @@
 # sensor-dashboard-ESP-BME680-reader
 
-Sends periodic `BME680` humidity, temperature, gas, pressure and altitude data from `esp32/esp8266 development board` to sensor dashboard backend.
+Sends periodic `BME680` humidity, temperature, gas, pressure and altitude data from `esp32/esp8266 development board` to [sensor dashboard](http://sensor-dashboard.trina.si/) backend.
 
 Built with PlatformIO.
 
