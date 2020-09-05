@@ -77,6 +77,7 @@ bool saveConfig(String ssid, String password, String sensorAccessToken) {
   if (
     !saveToEEPROM("ssid", ssid) ||
     !saveToEEPROM("password", password) ||
+    !saveToEEPROM("access_token", sensorAccessToken) ||
     !saveToEEPROM("magic_string", xstr(MAGIC_STRING))
   ) {
     retVal = false;
