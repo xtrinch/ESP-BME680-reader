@@ -25,9 +25,9 @@ String readFromEEPROM(String name) {
     Serial.println("Could not read unknown value " + name);
     return "";
   }
-  char value[33];
+  char value[60];
 
-  for(int i=0; i < 33; i++) {
+  for(int i=0; i < 60; i++) {
     char ch = (char)EEPROM.read(addr+i);
     value[i] = ch;
 
