@@ -1,6 +1,6 @@
 # sensor-dashboard-ESP-BME680-reader
 
-Sends periodic `BME680` humidity, temperature, gas, pressure and altitude data from `esp32/esp8266 development board` to sensor dashboard backend.
+Sends periodic `BME680` humidity, temperature, gas, pressure and altitude data from `esp32/esp8266 development board` to [sensor dashboard](http://sensor-dashboard.trina.si/) backend.
 
 Built with PlatformIO.
 
@@ -9,4 +9,17 @@ See also [backend](https://github.com/xtrinch/sensor-dashboard-nestjs-backend) a
 ## Setup
 
 1. Have a sensor dashboard backend running (see https://github.com/xtrinch/sensor-dashboard-nestjs-backend)
-2. Copy `import_env.example.py` to `import_env.py` and define you wifi SSID, passphrase, sensor access token & sensor dashboard url.
+2. Copy `import_env.example.py` to `import_env.py` and define your sensor dashboard url.
+3. When board boots connect to its WiFi called `beetleAP` with password `beetleAP`
+4. Input your WiFi's SSID, password and sensor access token with visiting this URL `192.168.4.1/?ssid=mySSID&password=myPassword&access_token=mysensoraccesstoken`
+
+## Components
+- Firebeetle ESP8266 or devkit v1 ESP32 (with minimal changes would work for other esp boards also)
+- pushbutton (for resetting credentials & token)
+- capacitor
+- resistor
+- 3.7V LiPo battery (or other)
+
+## Schematic
+
+![Image of Yaktocat](https://github.com/sensor-dashboard/sensor-dashboard-ESP-BME680-reader/blob/master/images/schematic.png)
