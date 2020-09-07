@@ -28,8 +28,6 @@ Text Label 3650 3450 0    50   ~ 0
 RST
 Text Label 2500 1950 0    50   ~ 0
 GPIO13
-Text Label 2600 3150 0    50   ~ 0
-GND
 $Comp
 L Switch:SW_Push SW1
 U 1 1 5F4AB5F8
@@ -102,19 +100,6 @@ F 3 "" H 5150 3450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GNDREF #PWR0102
-U 1 1 5F4E7867
-P 2250 3150
-F 0 "#PWR0102" H 2250 2900 50  0001 C CNN
-F 1 "GNDREF" H 2350 3200 50  0000 C CNN
-F 2 "" H 2250 3150 50  0001 C CNN
-F 3 "" H 2250 3150 50  0001 C CNN
-	1    2250 3150
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2250 3150 2800 3150
-$Comp
 L power:+3V3 #PWR0103
 U 1 1 5F4E90EE
 P 4350 2750
@@ -180,4 +165,61 @@ F 3 "" H 2700 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 NoConn ~ 2800 3450
+NoConn ~ 2050 2950
+Wire Wire Line
+	2050 2650 2250 2650
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5F56A445
+P 2250 2650
+F 0 "#PWR?" H 2250 2500 50  0001 C CNN
+F 1 "+3.3V" H 2265 2823 50  0000 C CNN
+F 2 "" H 2250 2650 50  0001 C CNN
+F 3 "" H 2250 2650 50  0001 C CNN
+	1    2250 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x05_Female J3
+U 1 1 5F567389
+P 1850 2850
+F 0 "J3" H 1742 2425 50  0000 C CNN
+F 1 "BME680" H 1742 2516 50  0000 C CNN
+F 2 "" H 1850 2850 50  0001 C CNN
+F 3 "~" H 1850 2850 50  0001 C CNN
+	1    1850 2850
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2250 3150 2800 3150
+$Comp
+L power:GNDREF #PWR0102
+U 1 1 5F4E7867
+P 2250 3150
+F 0 "#PWR0102" H 2250 2900 50  0001 C CNN
+F 1 "GNDREF" H 2200 3000 50  0000 C CNN
+F 2 "" H 2250 3150 50  0001 C CNN
+F 3 "" H 2250 3150 50  0001 C CNN
+	1    2250 3150
+	1    0    0    -1  
+$EndComp
+Text Label 2600 3150 0    50   ~ 0
+GND
+Wire Wire Line
+	2050 2750 2800 2750
+Wire Wire Line
+	2050 2850 2800 2850
+Wire Wire Line
+	2050 3050 2250 3050
+Wire Wire Line
+	2250 3050 2250 3150
+Connection ~ 2250 3150
+Text Label 2600 2750 0    50   ~ 0
+SDA
+Text Label 2600 2850 0    50   ~ 0
+SCL
+Text Label 2050 2750 0    50   ~ 0
+SDA
+Text Label 2050 2850 0    50   ~ 0
+SCL
 $EndSCHEMATC
