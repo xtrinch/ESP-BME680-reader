@@ -23,4 +23,6 @@ See also [backend](https://github.com/xtrinch/sensor-dashboard-nestjs-backend) a
 
 ## Schematic
 
+Schematic below is made for Firebeetle ESP8266.
+
 ![Image of Yaktocat](https://github.com/sensor-dashboard/sensor-dashboard-ESP-BME680-reader/blob/master/images/schematic.png)
