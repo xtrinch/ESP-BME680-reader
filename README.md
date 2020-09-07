@@ -15,6 +15,7 @@ See also [backend](https://github.com/xtrinch/sensor-dashboard-nestjs-backend) a
 
 ## Components
 - Firebeetle ESP8266 or devkit v1 ESP32 (with minimal changes would work for other esp boards also)
+- Bosch BME680 sensor module
 - pushbutton (for resetting credentials & token)
 - capacitor
 - resistor
