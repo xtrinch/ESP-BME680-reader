@@ -1,8 +1,8 @@
 #include "pushbutton.h"
 
-int btnState, prevBtnState;
+int btnState = BTN_RELEASED_STATE, prevBtnState = BTN_RELEASED_STATE;
 long btnPressCount = 0;
-unsigned long btnPressMillis = 0;
+unsigned long btnSampleMillis = 0;
 
 void setupButton() {
   // pin is pulled low by the button when active
@@ -12,8 +12,8 @@ void setupButton() {
 bool checkButtonPressed() {
   btnState = digitalRead(BTN_PIN); // check the state of the button
 
-  if (millis() - btnPressMillis >= BTN_SAMPLE_INTERVAL) {
-    btnPressMillis = millis();
+  if (millis() - btnSampleMillis >= BTN_SAMPLE_INTERVAL) {
+    btnSampleMillis = millis();
 
     if (btnState == BTN_PRESSED_STATE && prevBtnState == BTN_RELEASED_STATE) {
       Serial.println("Key press");
