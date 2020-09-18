@@ -38,18 +38,14 @@ void sendSuccessResponse(WiFiClient client) {
 }
 
 bool setupAP() {
-  Serial.print("Setting up soft-AP...");
   boolean result = WiFi.softAP(CFG_ONBOARD_WIFI_SSID, CFG_ONBOARD_WIFI_PASSWORD);
   if(!result) {
-    Serial.println("Soft-AP setup failed");
+    ardprintf("AP: Soft-AP setup failed");
     return false;
   }
   
-  Serial.println("Soft-AP setup success");
-
   IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
+  ardprintf("AP: IP address: %s", IP.toString().c_str());
 
   server.begin();
 
@@ -58,75 +54,72 @@ bool setupAP() {
 
 void listenForConfig() {
   bool credentialsSaved = false;
+  // Variable to store the HTTP request
+  char request[700] = "";
+  char currentLine[200] = "";                // make a String to hold incoming data from the client
 
   while(!credentialsSaved) {
-    // Variable to store the HTTP request
-    String request;
     WiFiClient client = server.available();   // Listen for incoming clients
 
-    if (client) {                             // If a new client connects
-      Serial.println("New client connection");          
-      String currentLine = "";                // make a String to hold incoming data from the client
-      while (client.connected()) {          
-        if (client.available()) {             // if there's bytes to read from the client,
-          char c = client.read();          
-          request += c;
-          if (c == '\n') {                    // if the byte is a newline character
-            // if the current line is blank, you got two newline characters in a row.
-            // that's the end of the client HTTP request, so send a response:
-            if (currentLine.length() == 0) {
-              if (
-                request.indexOf("GET /?") < 0
-                || request.indexOf("ssid") < 0
-                || request.indexOf("password") < 0
-                || request.indexOf("access_token") < 0
-              ) {
-                sendBadRequestResponse(client);
-                break;
-              }
-              Serial.println(request);
+    if (!client) continue;
+    
+    strcpy(request, "");
+    strcpy(currentLine, "");
+    // If we get to here, a new client connected
+    ardprintf("AP: New client connection");          
+    while (client.connected()) { 
+      // if there's no bytes to read from the client 
+      if (!client.available()) continue;        
 
-              // request in the form of /?ssid=mySSID&password=mySSIDPassword&access_token=sensorAccessToken
-              char *token = strtok((char *) request.c_str(), "?"); 
-              char *ssidName = strtok(NULL, "=");
-              char *ssidVal = strtok(NULL, "&");
-              char *passwordName = strtok(NULL, "=");
-              char *passwordVal = strtok(NULL, "&");
-              char *accessTokenName = strtok(NULL, "=");
-              char *accessTokenVal = strtok(NULL, " ");
+      char c = client.read();          
+      append(request, c);
 
-              if (
-                strcmp("ssid", ssidName) != 0 
-                || strcmp("password", passwordName) != 0 
-                || strcmp("access_token", accessTokenName) != 0
-              ) {
-                sendBadRequestResponse(client);
-                break;
-              }
-
-              credentialsSaved = saveConfig(ssidVal, passwordVal, accessTokenVal);
-              sendSuccessResponse(client);
-              
-              break;
-            } else { // if you got a newline, then clear currentLine
-              currentLine = "";
-            }
-          } else if (c != '\r') {  // if you got anything else but a carriage return character,
-            currentLine += c;      // add it to the end of the currentLine
+      if (c == '\n') { // if the byte is a newline character
+        // if the current line has zero characters, you got two newline characters in a row.
+        // that's the end of the client HTTP request, so send a response:
+        if (strlen(currentLine) == 0) {
+          if (
+            strstr(request, "GET /?") == NULL
+            || strstr(request, "ssid") == NULL
+            || strstr(request, "password") == NULL
+            || strstr(request, "access_token") == NULL
+          ) {
+            sendBadRequestResponse(client);
+            break;
           }
+
+          // request in the form of /?ssid=mySSID&password=mySSIDPassword&access_token=sensorAccessToken
+          strtok(request, "?"); 
+          char *ssidName = strtok(NULL, "="), *ssidVal = strtok(NULL, "&");
+          char *passwordName = strtok(NULL, "="), *passwordVal = strtok(NULL, "&");
+          char *accessTokenName = strtok(NULL, "="), *accessTokenVal = strtok(NULL, " ");
+
+          if (strcmp("ssid", ssidName) != 0 || strcmp("password", passwordName) != 0 || strcmp("access_token", accessTokenName) != 0) {
+            sendBadRequestResponse(client);
+            break;
+          }
+
+          credentialsSaved = saveConfig(ssidVal, passwordVal, accessTokenVal);
+          sendSuccessResponse(client);
+          break;
         }
+        
+        // if you got a newline, then clear currentLine
+        strcpy(currentLine, "");
+      } else if (c != '\r') {  // if you got anything else but a carriage return character,
+        // add it to the end of the currentLine
+        append(currentLine, c);
       }
-      // Clear the request variable
-      request = "";
-      // Close the connection
-      client.stop();
-      Serial.println("Client disconnected.");
     }
+    // Clear the request variable
+    strcpy(request, "");
+    // Close the connection
+    client.stop();
+    ardprintf("AP: Client disconnected.");
   }
 }
 
 bool cleanupAP() {
   server.stop();
-
   return true;
 }

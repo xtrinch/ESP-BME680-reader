@@ -19,16 +19,15 @@
 using namespace std;
 
 typedef struct Config_t {
-  String ssid;
-  String password;
+  char * ssid;
+  char * password;
 } Config;
 
 void setupEEPROM();
-bool saveConfig(String ssid, String password, String sensorAccessToken);
-bool saveToEEPROM(String name, String value);
-Config readConfig();
+bool saveConfig(const char * ssid, const char * password, const char * sensorAccessToken);
+bool saveToEEPROM(const char * name, const char * value);
 bool configSaved();
 bool clearConfig();
-String readFromEEPROM(String name);
+bool readFromEEPROM(char * buf, const char * name);
 
 #endif

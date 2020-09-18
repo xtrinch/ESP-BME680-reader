@@ -1,12 +1,13 @@
 #include "main.h"
 
-using namespace std;
-
 void setup() {
   Serial.begin(9600);
   while (!Serial);
 
   setupEEPROM();
+
+  // uncomment when you want to programmatically clear config
+  // clearConfig();
 
   setupButton();
 
@@ -21,7 +22,7 @@ void setup() {
 
   // do not do anything if button is pressed
   if (digitalRead(BTN_PIN) == BTN_PRESSED_STATE) {
-    Serial.println("Button pressed upon startup, skipping WiFi setup");
+    ardprintf("Button pressed upon startup, skipping WiFi setup");
     return;
   }
 
@@ -34,18 +35,19 @@ void setup() {
   };
 
   if (!bme.performReading()) {
-    Serial.println("Failed to perform reading :(");
+    ardprintf("Failed to perform reading :(");
     goToSleep();
     return;
   }
 
   if(WiFi.status() != WL_CONNECTED) {
-    Serial.print("WIFI disconnected.");
+    ardprintf("WIFI disconnected.");
     goToSleep();
     return;
   }
   
-  String jsonPayload = getJsonPayload(bme);
+  char jsonPayload[500];
+  getJsonPayload(jsonPayload, bme);
   // Serial.print(jsonPayload);
 
   sendMeasurement(jsonPayload);

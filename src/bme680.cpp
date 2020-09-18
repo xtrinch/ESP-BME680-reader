@@ -4,7 +4,7 @@ Adafruit_BME680 bme;
 
 bool setupBME680() {
   if (!bme.begin(0x76)) {
-    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    ardprintf("BME680: Could not find a valid BME680 sensor, check wiring!");
     return false;
   }
 
@@ -18,56 +18,56 @@ bool setupBME680() {
   return true;
 }
 
-String getJsonPayload(Adafruit_BME680 bme) {
+bool getJsonPayload(char * buf, Adafruit_BME680 bme) {
   float temperature = bme.temperature;
   // Serial.print("Temperature = ");
   // Serial.print(temperature);
-  // Serial.println(" *C");
+  // ardprintf(" *C");
 
   float pressure = bme.pressure / 100.0;
   // Serial.print("Pressure = ");
   // Serial.print(pressure);
-  // Serial.println(" hPa");
+  // ardprintf(" hPa");
 
   float humidity = bme.humidity;
   // Serial.print("Humidity = ");
   // Serial.print(humidity);
-  // Serial.println(" %");
+  // ardprintf(" %");
 
   float gas_resistance = bme.gas_resistance / 1000.0;
   // Serial.print("Gas = ");
   // Serial.print(gas_resistance);
-  // Serial.println(" KOhms");
+  // ardprintf(" KOhms");
 
   float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
   // Serial.print("Approx. Altitude = ");
   // Serial.print(altitude);
-  // Serial.println(" m");
+  // ardprintf(" m");
 
-  String jsonPayload = "{" 
+  snprintf(buf, 500, "{" 
       "\"measurements\":["
         "{"
-            "\"measurement\": " + String(humidity) + ","
+            "\"measurement\": %f,"
             "\"measurementType\": \"humidity\""
         "},"
         "{"
-            "\"measurement\": " + String(temperature) + ","
+            "\"measurement\": %f,"
             "\"measurementType\": \"temperature\""
         "},"
         "{"
-            "\"measurement\": " + String(gas_resistance) + ","
+            "\"measurement\": %f,"
             "\"measurementType\": \"gas\""
         "},"
         "{"
-            "\"measurement\": " + String(altitude) + ","
+            "\"measurement\": %f,"
             "\"measurementType\": \"altitude\""
         "},"
         "{"
-            "\"measurement\": " + String(pressure) + ","
+            "\"measurement\": %f,"
             "\"measurementType\": \"pressure\""
         "}"
       "]"
-  "}";
+  "}", humidity, temperature, gas_resistance, altitude, pressure);
 
-  return jsonPayload;
+  return true;
 }

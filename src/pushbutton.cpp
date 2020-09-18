@@ -16,10 +16,10 @@ bool checkButtonPressed() {
     btnSampleMillis = millis();
 
     if (btnState == BTN_PRESSED_STATE && prevBtnState == BTN_RELEASED_STATE) {
-      Serial.println("Key press");
+      ardprintf("Key press");
       btnPressCount = 0;
     } else if (btnState == BTN_RELEASED_STATE && prevBtnState == BTN_PRESSED_STATE) {
-      Serial.println("Key release");
+      ardprintf("Key release");
 
       // make sure to call this on release only, as we do not want the button pressed when it resets
       if (btnPressCount >= BTN_RESET_CYCLES) {

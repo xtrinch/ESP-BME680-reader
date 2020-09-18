@@ -17,6 +17,6 @@
 #define CFG_SENSOR_DASHBOARD_URL xstr(SENSOR_DASHBOARD_URL)
 
 bool setupWiFi();
-bool sendMeasurement(String jsonPayload);
+bool sendMeasurement(const char * jsonPayload);
 
 #endif

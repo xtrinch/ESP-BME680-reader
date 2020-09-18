@@ -1,8 +1,7 @@
 #include "sleep.h"
 
 void goToSleep() {
-  Serial.println("Setup ESP32 to sleep for every " + String(CFG_SLEEP_SECONDS) +
-  " Seconds");
+  ardprintf("Sleep: Setup ESP32 to sleep for every %d seconds ", CFG_SLEEP_SECONDS);
 
   #ifdef ESP32
   esp_sleep_enable_timer_wakeup(CFG_SLEEP_SECONDS * uS_TO_S_FACTOR);
@@ -22,5 +21,5 @@ void goToSleep() {
   ESP.deepSleep(CFG_SLEEP_SECONDS * uS_TO_S_FACTOR, WAKE_RFCAL);
   #endif
 
-  Serial.println("This will never be printed");
+  ardprintf("This will never be printed");
 }
