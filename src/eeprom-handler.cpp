@@ -1,4 +1,3 @@
-
 #include "eeprom-handler.h"
 
 void setupEEPROM() {
@@ -20,8 +19,6 @@ int getEEPROMAddress(const char * name) {
 }
 
 bool readFromEEPROM(char * buf, const char * name) {
-  char value[60];
-
   int addr = getEEPROMAddress(name);
   if (addr < 0) {
     ardprintf("EEPROM: Could not read unknown value %s", name);
@@ -30,20 +27,18 @@ bool readFromEEPROM(char * buf, const char * name) {
 
   for(int i=0; i < 60; i++) {
     char ch = (char)EEPROM.read(addr+i);
-    value[i] = ch;
+    buf[i] = ch;
 
     if (ch == '\0') {
       break;
     }
   }
 
-  ardprintf("EEPROM: read %s: %s", name, value);
-
-  strcpy(buf, value);
+  ardprintf("EEPROM: read %s: %s", name, buf);
   return true;
 }
 
-bool configSaved() {
+bool isConfigSaved() {
   char magicString[60];
   readFromEEPROM(magicString, "magic_string");
 
@@ -88,9 +83,9 @@ bool saveToEEPROM(const char * name, const char * value) {
   }
  
   for(int i=0; i < (int)strlen(value); i++) {
-    EEPROM.write(addr+i, value[i]);
+    EEPROM.write(addr + i, value[i]);
   }
-  EEPROM.write(addr+strlen(value),'\0');
+  EEPROM.write(addr + strlen(value), '\0');
 
   bool success = EEPROM.commit(); 
 

@@ -15,6 +15,7 @@
 #include "eeprom-handler.h"
 
 #define CFG_SENSOR_DASHBOARD_URL xstr(SENSOR_DASHBOARD_URL)
+#define WIFI_CONNECT_RETRIES 50
 
 bool setupWiFi();
 bool sendMeasurement(const char * jsonPayload);

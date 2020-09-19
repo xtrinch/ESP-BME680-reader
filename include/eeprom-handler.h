@@ -18,15 +18,10 @@
 
 using namespace std;
 
-typedef struct Config_t {
-  char * ssid;
-  char * password;
-} Config;
-
 void setupEEPROM();
 bool saveConfig(const char * ssid, const char * password, const char * sensorAccessToken);
 bool saveToEEPROM(const char * name, const char * value);
-bool configSaved();
+bool isConfigSaved();
 bool clearConfig();
 bool readFromEEPROM(char * buf, const char * name);
 

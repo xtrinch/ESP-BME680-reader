@@ -3,7 +3,7 @@
 HTTPClient http;
 
 bool setupWiFi() {
-  int wifiRetriesLeft = 50;
+  int wifiRetriesLeft = WIFI_CONNECT_RETRIES;
 
   char ssid[60];
   readFromEEPROM(ssid, "ssid");
@@ -28,7 +28,6 @@ bool setupWiFi() {
   ardprintf("Station: Connected to WiFi");
 
   http.begin("http://" + String(CFG_SENSOR_DASHBOARD_URL) + "/api/measurements/multi");
-
   return true;
 }
 

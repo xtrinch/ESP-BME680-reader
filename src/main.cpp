@@ -11,7 +11,7 @@ void setup() {
 
   setupButton();
 
-  if (!configSaved()) {
+  if (!isConfigSaved()) {
     if (!setupAP()) {
       goToSleep();
     }
