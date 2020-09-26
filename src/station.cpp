@@ -31,25 +31,36 @@ bool setupWiFi() {
   return true;
 }
 
-bool sendMeasurement(const char * jsonPayload) {
-  char accessToken[60];
-  readFromEEPROM(accessToken, "access_token");
-
+bool makeNetworkRequest(const char * url, const char * authorization, const char * content) {
+  HTTPClient http;
+  http.begin(url);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Accept", "application/json");
-  http.addHeader("Authorization", accessToken);
-  int httpResponseCode = http.POST(jsonPayload);
+  http.addHeader("Authorization", authorization);
+  int httpResponseCode = http.POST(content);
 
   if (httpResponseCode > 0) {
     ardprintf("Station: HTTP Response code: %d", httpResponseCode);
-    // String payload = http.getString();
-    // ardprintf(payload);
+    const char * payload = http.getString().c_str();
+    ardprintf("%s", payload);
+    http.end();
     return true;
   }
   else {
+    http.end();
     ardprintf("Station: Error code: %d", httpResponseCode);
     return false;
   }
 
   return false;
+}
+
+bool sendMeasurement(const char * jsonPayload) {
+  char url[150];
+  snprintf(url, 500, "http://%s/api/measurements/multi", CFG_SENSOR_DASHBOARD_URL);
+
+  char accessToken[60];
+  readFromEEPROM(accessToken, "access_token");
+
+  return makeNetworkRequest(url, accessToken, jsonPayload);
 }

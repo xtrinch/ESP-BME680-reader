@@ -12,7 +12,7 @@ int getEEPROMAddress(const char * name) {
   } else if (strcmp(name, "magic_string") == 0) {
     return MAGIC_STRING_ADDRESS;
   } else if (strcmp(name, "access_token") == 0) {
-    return SENSOR_ACCESS_TOKEN_ADDRESS;
+    return ACCESS_TOKEN_ADDRESS;
   }
 
   return -1;
