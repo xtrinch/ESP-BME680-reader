@@ -3,6 +3,7 @@
 Adafruit_BME680 bme; 
 
 bool setupBME680() {
+  // i2c address 0x76
   if (!bme.begin(0x76)) {
     ardprintf("BME680: Could not find a valid BME680 sensor, check wiring!");
     return false;

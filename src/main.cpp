@@ -11,7 +11,6 @@ void setup() {
 
   setupButton();
 
-  #ifndef PRECONFIGURED
   if (!isConfigSaved()) {
     if (!setupAP()) {
       goToSleep();
@@ -20,7 +19,6 @@ void setup() {
     listenForConfig();
     cleanupAP();
   }
-  #endif
 
   // do not do anything if button is pressed
   if (digitalRead(BTN_PIN) == BTN_PRESSED_STATE) {
@@ -36,14 +34,9 @@ void setup() {
     goToSleep();
   };
 
+  // make a sensor reading
   if (!bme.performReading()) {
     ardprintf("Failed to perform reading :(");
-    goToSleep();
-    return;
-  }
-
-  if(WiFi.status() != WL_CONNECTED) {
-    ardprintf("WIFI disconnected.");
     goToSleep();
     return;
   }
