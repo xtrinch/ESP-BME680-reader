@@ -8,6 +8,7 @@ See also [backend](https://github.com/xtrinch/sensor-dashboard-nestjs-backend) a
 
 ## Setup
 
+0. Make sure to clone with `git clone --recursive REPO-URL` to make sure ESP-make-easy submodule is cloned along
 1. Have a sensor dashboard backend running (see https://github.com/xtrinch/sensor-dashboard-nestjs-backend)
 2. Copy `import_env.example.py` to `import_env.py` and define your sensor dashboard url.
 3. When board boots connect to its WiFi called `beetleAP` with password `beetleAP`
