@@ -1,7 +1,7 @@
 #include "main.h"
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial);
 
   setupEEPROM();
@@ -11,6 +11,7 @@ void setup() {
 
   setupButton();
 
+  #ifndef PRECONFIGURED
   if (!isConfigSaved()) {
     if (!setupAP()) {
       goToSleep();
@@ -19,6 +20,7 @@ void setup() {
     listenForConfig();
     cleanupAP();
   }
+  #endif
 
   // do not do anything if button is pressed
   if (digitalRead(BTN_PIN) == BTN_PRESSED_STATE) {
@@ -50,7 +52,14 @@ void setup() {
   getJsonPayload(jsonPayload, bme);
   // Serial.print(jsonPayload);
 
-  sendMeasurement(jsonPayload);
+  char url[150];
+  snprintf(url, 500, "http://%s/api/measurements/multi", CFG_SENSOR_DASHBOARD_URL);
+  char accessToken[60] = CFG_ACCESS_TOKEN;
+  #ifndef PRECONFIGURED
+  readFromEEPROM(accessToken, "access_token");
+  #endif
+
+  makeNetworkRequest(url, accessToken, jsonPayload);
 }
 
 void loop() {

@@ -2,7 +2,7 @@
 #define BME680_H_INCLUDED
 
 #include <Arduino.h>
-#include "Adafruit_BME680.h"
+#include <Adafruit_BME680.h>
 #include "common.h"
 
 #define SEALEVELPRESSURE_HPA (1013.25)
