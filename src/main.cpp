@@ -46,13 +46,13 @@ void setup() {
   // Serial.print(jsonPayload);
 
   char url[150];
-  snprintf(url, 500, "http://%s/api/measurements/multi", CFG_SENSOR_DASHBOARD_URL);
+  snprintf(url, 500, "https://%s/api/measurements/multi", CFG_SENSOR_DASHBOARD_URL);
   char accessToken[60] = CFG_ACCESS_TOKEN;
   #ifndef PRECONFIGURED
   readFromEEPROM(accessToken, "access_token");
   #endif
 
-  makeNetworkRequest(url, accessToken, jsonPayload);
+  makeSecureNetworkRequest(url, accessToken, jsonPayload);
 }
 
 void loop() {
